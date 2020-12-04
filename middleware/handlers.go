@@ -251,7 +251,7 @@ func updatePatrol(id int64, patrol models.Patrol) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `UPDATE patrols SET graphID=$2, mapVerID=$3, name=$4, points=$5 WHERE id=$1`
+	sqlStatement := `UPDATE patrols SET graphID=$2, mapVerID=$3, name=$4, points=$5 WHERE patrolid=$1`
 
 	res, err := db.Exec(sqlStatement, id, patrol.GraphID, patrol.MapVerID, patrol.Name, patrol.Points)
 
@@ -277,7 +277,7 @@ func deletePatrol(id int64) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `DELETE FROM patrols WHERE id=$1`
+	sqlStatement := `DELETE FROM patrols WHERE patrolid=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
