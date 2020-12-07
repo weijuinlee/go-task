@@ -14,10 +14,11 @@ func Router() *mux.Router {
 	router.HandleFunc("/editor/patrol/{id}", middleware.GetPatrol).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/patrol", middleware.GetAllPatrol).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/patrol", middleware.CreatePatrol).Methods("POST", "OPTIONS")
-	router.HandleFunc("/editor/robot", middleware.CreateRobot).Methods("POST", "OPTIONS")
 	router.HandleFunc("/editor/patrol/{id}", middleware.UpdatePatrol).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/editor/patrol/{id}", middleware.DeletePatrol).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/editor/robot", middleware.CreateRobot).Methods("POST", "OPTIONS")
 	router.HandleFunc("/editor/robot", middleware.GetAllRobots).Methods("GET", "OPTIONS")
+	router.HandleFunc("/editor/robot/{id}", middleware.DeletePatrol).Methods("DELETE", "OPTIONS")
 
 	return router
 }

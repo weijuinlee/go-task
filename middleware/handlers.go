@@ -166,8 +166,31 @@ func UpdatePatrol(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// DeletePatrol delete graph's detail in the postgres db
+// DeletePatrol delete patrol's detail in the postgres db
 func DeletePatrol(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	deletedRows := deleteRobot(int64(id))
+
+	msg := fmt.Sprintf("Patrol deleted successfully. Total rows/record affected %v", deletedRows)
+
+	res := response{
+		ID:      int64(id),
+		Message: msg,
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
+// DeleteRobot delete robot's detail in the postgres db
+func DeleteRobot(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 
@@ -179,7 +202,7 @@ func DeletePatrol(w http.ResponseWriter, r *http.Request) {
 
 	deletedRows := deletePatrol(int64(id))
 
-	msg := fmt.Sprintf("Patrol deleted successfully. Total rows/record affected %v", deletedRows)
+	msg := fmt.Sprintf("Robot deleted successfully. Total rows/record affected %v", deletedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -224,13 +247,13 @@ func insertRobot(robot models.Robot) int64 {
 
 	// create the insert sql query
 	// returning robotid will return the id of the inserted patrol
-	sqlStatement := `INSERT INTO robots (robotID) VALUES ($1) RETURNING id`
+	sqlStatement := `INSERT INTO robots (robotID, name) VALUES ($1, $2) RETURNING id`
 
 	var id int64
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, robot.RobotID).Scan(&id)
+	err := db.QueryRow(sqlStatement, robot.RobotID, robot.Name).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -314,7 +337,7 @@ func getAllRobots() ([]models.Robot, error) {
 
 	var robots []models.Robot
 
-	sqlStatement := `SELECT * FROM robots`
+	sqlStatement := `SELECT robotID,name FROM robots`
 
 	rows, err := db.Query(sqlStatement)
 
@@ -328,7 +351,7 @@ func getAllRobots() ([]models.Robot, error) {
 
 		var robot models.Robot
 
-		err = rows.Scan(&robot.ID, &robot.RobotID)
+		err = rows.Scan(&robot.RobotID, &robot.Name)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -375,6 +398,32 @@ func deletePatrol(id int64) int64 {
 	defer db.Close()
 
 	sqlStatement := `DELETE FROM patrols WHERE patrolid=$1`
+
+	res, err := db.Exec(sqlStatement, id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Error while checking the affected rows. %v", err)
+	}
+
+	fmt.Println("Total rows/record affected ", rowsAffected)
+
+	return rowsAffected
+}
+
+// delete robot in the DB
+func deleteRobot(id int64) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	sqlStatement := `DELETE FROM robots WHERE id=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
