@@ -177,7 +177,7 @@ func DeletePatrol(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to convert the string into int.  %v", err)
 	}
 
-	deletedRows := deleteRobot(int64(id))
+	deletedRows := deletePatrol(int64(id))
 
 	msg := fmt.Sprintf("Patrol deleted successfully. Total rows/record affected %v", deletedRows)
 
@@ -402,13 +402,17 @@ func deletePatrol(id int64) int64 {
 	res, err := db.Exec(sqlStatement, id)
 
 	if err != nil {
+
 		log.Fatalf("Unable to execute the query. %v", err)
+
 	}
 
 	rowsAffected, err := res.RowsAffected()
 
 	if err != nil {
+
 		log.Fatalf("Error while checking the affected rows. %v", err)
+
 	}
 
 	fmt.Println("Total rows/record affected ", rowsAffected)
