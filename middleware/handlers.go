@@ -68,6 +68,28 @@ func CreatePatrol(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// CreateRobot create a robot in the postgres db
+func CreateRobot(w http.ResponseWriter, r *http.Request) {
+
+	var robot models.Robot
+
+	err := json.NewDecoder(r.Body).Decode(&robot)
+
+	if err != nil {
+
+		panic("Unable to decode the request body.")
+
+	}
+
+	insertID := insertRobot(robot)
+
+	res := response{
+		ID:      insertID,
+		Message: "Robot created successfully",
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
 // GetPatrol will return a single graph by its id
 func GetPatrol(w http.ResponseWriter, r *http.Request) {
 
@@ -98,6 +120,19 @@ func GetAllPatrol(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(patrols)
+}
+
+// GetAllRobots will return all robots
+func GetAllRobots(w http.ResponseWriter, r *http.Request) {
+
+	robots, err := getAllRobots()
+
+	if err != nil {
+		log.Fatalf("Unable to get all robots. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(robots)
+
 }
 
 // UpdatePatrol update patrol's detail in the postgres db
@@ -180,6 +215,32 @@ func insertPatrol(patrol models.Patrol) int64 {
 	return id
 }
 
+// insert one robot in the DB
+func insertRobot(robot models.Robot) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	// create the insert sql query
+	// returning robotid will return the id of the inserted patrol
+	sqlStatement := `INSERT INTO robots (robotID) VALUES ($1) RETURNING id`
+
+	var id int64
+
+	// execute the sql statement
+	// Scan function will save the insert id in the id
+	err := db.QueryRow(sqlStatement, robot.RobotID).Scan(&id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	fmt.Println("Inserted a single record as id:", id)
+
+	return id
+}
+
 // get one graph from the DB by its id
 func getPatrol(id int64) (models.Patrol, error) {
 
@@ -242,6 +303,42 @@ func getAllPatrol() ([]models.Patrol, error) {
 	}
 
 	return patrols, err
+}
+
+// get all robots from the DB
+func getAllRobots() ([]models.Robot, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var robots []models.Robot
+
+	sqlStatement := `SELECT * FROM robots`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var robot models.Robot
+
+		err = rows.Scan(&robot.ID, &robot.RobotID)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		robots = append(robots, robot)
+
+	}
+
+	return robots, err
 }
 
 // update patrol in the DB
