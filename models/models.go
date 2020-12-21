@@ -20,6 +20,7 @@ type Robot struct {
 // Task schema of the robot table
 type Task struct {
 	ID          int64           `json:"id"`
+	Type        int64           `json:"type"`
 	TaskDetails json.RawMessage `json:"taskDetails"`
 }
 

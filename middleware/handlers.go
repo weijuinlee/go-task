@@ -223,10 +223,23 @@ func GetAllRobots(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAllTasks will return all tasks
-func GetAllTasks(w http.ResponseWriter, r *http.Request) {
+// GetAllPatrolTasks will return all tasks
+func GetAllPatrolTasks(w http.ResponseWriter, r *http.Request) {
 
-	tasks, err := getAllTasks()
+	tasks, err := getAllPatrolTasks()
+
+	if err != nil {
+		log.Fatalf("Unable to get all tasks. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(tasks)
+
+}
+
+// GetAllGotoTasks will return all tasks
+func GetAllGotoTasks(w http.ResponseWriter, r *http.Request) {
+
+	tasks, err := getAllGotoTasks()
 
 	if err != nil {
 		log.Fatalf("Unable to get all tasks. %v", err)
@@ -367,6 +380,29 @@ func DeleteRobot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// DeleteTask delete task's detail in the postgres db
+func DeleteTask(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	deletedRows := deleteTask(int64(id))
+
+	msg := fmt.Sprintf("Task deleted successfully. Total rows/record affected %v", deletedRows)
+
+	res := response{
+		ID:      int64(id),
+		Message: msg,
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
 func insertGraph(graph models.Graph) int64 {
 
 	db := createConnection()
@@ -453,13 +489,13 @@ func insertTask(task models.Task) int64 {
 
 	// create the insert sql query
 	// returning id will return the id of the inserted task
-	sqlStatement := `INSERT INTO tasks (taskDetails) VALUES ($1) RETURNING taskID`
+	sqlStatement := `INSERT INTO tasks (type, taskDetails) VALUES ($1, $2) RETURNING taskID`
 
 	var id int64
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, task.TaskDetails).Scan(&id)
+	err := db.QueryRow(sqlStatement, task.Type, task.TaskDetails).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -671,7 +707,7 @@ func getAllRobots() ([]models.Robot, error) {
 }
 
 // get all tasks from the DB
-func getAllTasks() ([]models.Task, error) {
+func getAllPatrolTasks() ([]models.Task, error) {
 
 	db := createConnection()
 
@@ -679,7 +715,7 @@ func getAllTasks() ([]models.Task, error) {
 
 	var tasks []models.Task
 
-	sqlStatement := `SELECT * FROM tasks`
+	sqlStatement := `SELECT * FROM tasks where type = 0`
 
 	rows, err := db.Query(sqlStatement)
 
@@ -693,7 +729,43 @@ func getAllTasks() ([]models.Task, error) {
 
 		var task models.Task
 
-		err = rows.Scan(&task.ID, &task.TaskDetails)
+		err = rows.Scan(&task.ID, &task.Type, &task.TaskDetails)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		tasks = append(tasks, task)
+
+	}
+
+	return tasks, err
+}
+
+// get all goto tasks from the DB
+func getAllGotoTasks() ([]models.Task, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var tasks []models.Task
+
+	sqlStatement := `SELECT * FROM tasks where type = 1`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var task models.Task
+
+		err = rows.Scan(&task.ID, &task.Type, &task.TaskDetails)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -822,6 +894,32 @@ func deleteRobot(id int64) int64 {
 	defer db.Close()
 
 	sqlStatement := `DELETE FROM robots WHERE id=$1`
+
+	res, err := db.Exec(sqlStatement, id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Error while checking the affected rows. %v", err)
+	}
+
+	fmt.Println("Total rows/record affected ", rowsAffected)
+
+	return rowsAffected
+}
+
+// delete task in the DB
+func deleteTask(id int64) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	sqlStatement := `DELETE FROM tasks WHERE id=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
