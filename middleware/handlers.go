@@ -68,6 +68,50 @@ func CreatePatrol(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// CreateTask create a task in the postgres db
+func CreateTask(w http.ResponseWriter, r *http.Request) {
+
+	var task models.Task
+
+	err := json.NewDecoder(r.Body).Decode(&task)
+
+	if err != nil {
+
+		panic("Unable to decode the request body.")
+
+	}
+
+	insertID := insertTask(task)
+
+	res := response{
+		ID:      insertID,
+		Message: "Task created successfully",
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
+// CreateGraph create a user in the postgres db
+func CreateGraph(w http.ResponseWriter, r *http.Request) {
+
+	var graph models.Graph
+
+	err := json.NewDecoder(r.Body).Decode(&graph)
+
+	if err != nil {
+
+		panic("Unable to decode the request body.")
+
+	}
+
+	insertID := insertGraph(graph)
+
+	res := response{
+		ID:      insertID,
+		Message: "Graph created successfully",
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
 // CreateRobot create a robot in the postgres db
 func CreateRobot(w http.ResponseWriter, r *http.Request) {
 
@@ -88,6 +132,50 @@ func CreateRobot(w http.ResponseWriter, r *http.Request) {
 		Message: "Robot created successfully",
 	}
 	json.NewEncoder(w).Encode(res)
+}
+
+// GetGraph will return a single graph by its id
+func GetGraph(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	graph, err := getGraph(int64(id))
+
+	if err != nil {
+		log.Fatalf("Unable to get graph. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(graph)
+}
+
+// GetAllGraphDetailed will return all the graphs
+func GetAllGraphDetailed(w http.ResponseWriter, r *http.Request) {
+
+	graphs, err := getAllGraphDetailed()
+
+	if err != nil {
+		log.Fatalf("Unable to get all graph. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(graphs)
+}
+
+// GetAllGraphNonDetailed will return all the graphs
+func GetAllGraphNonDetailed(w http.ResponseWriter, r *http.Request) {
+
+	graphs, err := getAllGraphNonDetailed()
+
+	if err != nil {
+		log.Fatalf("Unable to get all graph. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(graphs)
 }
 
 // GetPatrol will return a single graph by its id
@@ -135,6 +223,50 @@ func GetAllRobots(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetAllTasks will return all tasks
+func GetAllTasks(w http.ResponseWriter, r *http.Request) {
+
+	tasks, err := getAllTasks()
+
+	if err != nil {
+		log.Fatalf("Unable to get all tasks. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(tasks)
+
+}
+
+// UpdateGraph update graph's detail in the postgres db
+func UpdateGraph(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	var graph models.Graph
+
+	err = json.NewDecoder(r.Body).Decode(&graph)
+
+	if err != nil {
+		log.Fatalf("Unable to decode the request body.  %v", err)
+	}
+
+	updatedRows := updateGraph(int64(id), graph)
+
+	msg := fmt.Sprintf("Graph updated successfully. Total rows/record affected %v", updatedRows)
+
+	res := response{
+		ID:      int64(id),
+		Message: msg,
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
 // UpdatePatrol update patrol's detail in the postgres db
 func UpdatePatrol(w http.ResponseWriter, r *http.Request) {
 
@@ -157,6 +289,29 @@ func UpdatePatrol(w http.ResponseWriter, r *http.Request) {
 	updatedRows := updatePatrol(int64(id), patrol)
 
 	msg := fmt.Sprintf("Patrol updated successfully. Total rows/record affected %v", updatedRows)
+
+	res := response{
+		ID:      int64(id),
+		Message: msg,
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
+// DeleteGraph delete graph's detail in the postgres db
+func DeleteGraph(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	deletedRows := deleteGraph(int64(id))
+
+	msg := fmt.Sprintf("Graph updated successfully. Total rows/record affected %v", deletedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -212,6 +367,31 @@ func DeleteRobot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+func insertGraph(graph models.Graph) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	// create the insert sql query
+	// returning graphid will return the id of the inserted graph
+	sqlStatement := `INSERT INTO graphs (mapVerID, scale, name, location, level, lanes, vertices) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING graphid`
+
+	var id int64
+
+	// execute the sql statement
+	// Scan function will save the insert id in the id
+	err := db.QueryRow(sqlStatement, graph.MapVerID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices).Scan(&id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	fmt.Println("Inserted a single record as id:", id)
+
+	return id
+}
+
 // insert one patrol in the DB
 func insertPatrol(patrol models.Patrol) int64 {
 
@@ -264,6 +444,60 @@ func insertRobot(robot models.Robot) int64 {
 	return id
 }
 
+// insert one robot in the DB
+func insertTask(task models.Task) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	// create the insert sql query
+	// returning id will return the id of the inserted task
+	sqlStatement := `INSERT INTO tasks (taskDetails) VALUES ($1) RETURNING taskID`
+
+	var id int64
+
+	// execute the sql statement
+	// Scan function will save the insert id in the id
+	err := db.QueryRow(sqlStatement, task.TaskDetails).Scan(&id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	fmt.Println("Inserted a single record as id:", id)
+
+	return id
+}
+
+// get one graph from the DB by its id
+func getGraph(id int64) (models.Graph, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var graph models.Graph
+
+	sqlStatement := `SELECT * FROM graphs WHERE graphid=$1`
+
+	row := db.QueryRow(sqlStatement, id)
+
+	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return graph, nil
+	case nil:
+		return graph, nil
+	default:
+		log.Fatalf("Unable to scan the row. %v", err)
+	}
+
+	return graph, err
+}
+
 // get one graph from the DB by its id
 func getPatrol(id int64) (models.Patrol, error) {
 
@@ -290,6 +524,78 @@ func getPatrol(id int64) (models.Patrol, error) {
 	}
 
 	return patrol, err
+}
+
+// get all graph from the DB
+func getAllGraphDetailed() ([]models.Graph, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var graphs []models.Graph
+
+	sqlStatement := `SELECT * FROM graphs`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var graph models.Graph
+
+		err = rows.Scan(&graph.ID, &graph.MapVerID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		graphs = append(graphs, graph)
+
+	}
+
+	return graphs, err
+}
+
+// get all graph from the DB
+func getAllGraphNonDetailed() ([]models.GraphNonDetailed, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var graphs []models.GraphNonDetailed
+
+	sqlStatement := `SELECT graphid, name, location FROM graphs`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var graph models.GraphNonDetailed
+
+		err = rows.Scan(&graph.ID, &graph.Name, &graph.Location)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		graphs = append(graphs, graph)
+
+	}
+
+	return graphs, err
 }
 
 // get all patrol from the DB
@@ -364,6 +670,68 @@ func getAllRobots() ([]models.Robot, error) {
 	return robots, err
 }
 
+// get all tasks from the DB
+func getAllTasks() ([]models.Task, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var tasks []models.Task
+
+	sqlStatement := `SELECT * FROM tasks`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var task models.Task
+
+		err = rows.Scan(&task.ID, &task.TaskDetails)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		tasks = append(tasks, task)
+
+	}
+
+	return tasks, err
+}
+
+// update graph in the DB
+func updateGraph(id int64, graph models.Graph) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	sqlStatement := `UPDATE graphs SET mapVerID=$2, scale=$3, name=$4, location=$5, level=$6, lanes=$7, vertices=$8 WHERE graphid=$1`
+
+	res, err := db.Exec(sqlStatement, id, graph.MapVerID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Error while checking the affected rows. %v", err)
+	}
+
+	fmt.Printf("Total rows/record affected %v", rowsAffected)
+
+	return rowsAffected
+}
+
 // update patrol in the DB
 func updatePatrol(id int64, patrol models.Patrol) int64 {
 
@@ -386,6 +754,32 @@ func updatePatrol(id int64, patrol models.Patrol) int64 {
 	}
 
 	fmt.Printf("Total rows/record affected %v", rowsAffected)
+
+	return rowsAffected
+}
+
+// delete graph in the DB
+func deleteGraph(id int64) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	sqlStatement := `DELETE FROM graphs WHERE graphid=$1`
+
+	res, err := db.Exec(sqlStatement, id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Error while checking the affected rows. %v", err)
+	}
+
+	fmt.Println("Total rows/record affected ", rowsAffected)
 
 	return rowsAffected
 }

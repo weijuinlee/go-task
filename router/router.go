@@ -11,6 +11,12 @@ func Router() *mux.Router {
 
 	router := mux.NewRouter()
 
+	router.HandleFunc("/editor/graph/detailed/{id}", middleware.GetGraph).Methods("GET", "OPTIONS")
+	router.HandleFunc("/editor/graph/detailed", middleware.GetAllGraphDetailed).Methods("GET", "OPTIONS")
+	router.HandleFunc("/editor/graph/nondetailed", middleware.GetAllGraphNonDetailed).Methods("GET", "OPTIONS")
+	router.HandleFunc("/editor/graph", middleware.CreateGraph).Methods("POST", "OPTIONS")
+	router.HandleFunc("/editor/graph/{id}", middleware.UpdateGraph).Methods("PUT", "OPTIONS")
+	router.HandleFunc("/editor/graph/{id}", middleware.DeleteGraph).Methods("DELETE", "OPTIONS")
 	router.HandleFunc("/editor/patrol/{id}", middleware.GetPatrol).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/patrol", middleware.GetAllPatrol).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/patrol", middleware.CreatePatrol).Methods("POST", "OPTIONS")
@@ -19,6 +25,8 @@ func Router() *mux.Router {
 	router.HandleFunc("/editor/robot", middleware.CreateRobot).Methods("POST", "OPTIONS")
 	router.HandleFunc("/editor/robot", middleware.GetAllRobots).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/robot/{id}", middleware.DeletePatrol).Methods("DELETE", "OPTIONS")
+	router.HandleFunc("/editor/task", middleware.CreateTask).Methods("POST", "OPTIONS")
+	router.HandleFunc("/editor/task", middleware.GetAllTasks).Methods("GET", "OPTIONS")
 
 	return router
 }
