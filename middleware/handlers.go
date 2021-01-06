@@ -613,31 +613,39 @@ func insertTask(task models.Task) int64 {
 }
 
 // get one graph from the DB by its id
-func getGraph(id int64) (models.Graph, error) {
+func getGraph(id int64) ([]models.Graph, error) {
 
 	db := createConnection()
 
 	defer db.Close()
 
-	var graph models.Graph
+	var graphs []models.Graph
 
 	sqlStatement := `SELECT * FROM graphs WHERE graphid=$1`
 
-	row := db.QueryRow(sqlStatement, id)
+	rows, err := db.Query(sqlStatement)
 
-	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
-
-	switch err {
-	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-		return graph, nil
-	case nil:
-		return graph, nil
-	default:
-		log.Fatalf("Unable to scan the row. %v", err)
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
 	}
 
-	return graph, err
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var graph models.Graph
+
+		err = rows.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		graphs = append(graphs, graph)
+
+	}
+
+	return graphs, err
 }
 
 // get one graph from the DB by its id
