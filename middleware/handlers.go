@@ -883,7 +883,7 @@ func updateGraph(id int64, graph models.Graph) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `UPDATE graphs SET mapVerID=$2, collecctionID=$3, scale=$4, name=$5, location=$6, level=$7, lanes=$8, vertices=$9 WHERE graphid=$1`
+	sqlStatement := `UPDATE graphs SET mapVerID=$2, collectionID=$3, scale=$4, name=$5, location=$6, level=$7, lanes=$8, vertices=$9 WHERE graphid=$1`
 
 	res, err := db.Exec(sqlStatement, id, graph.MapVerID, graph.CollectionID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices)
 
