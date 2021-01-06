@@ -286,27 +286,6 @@ func GetAllCollection(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetGraphInCollection will return all the graphs
-func GetGraphInCollection(w http.ResponseWriter, r *http.Request) {
-
-	params := mux.Vars(r)
-
-	id, err := strconv.Atoi(params["id"])
-
-	if err != nil {
-		log.Fatalf("Unable to convert the string into int.  %v", err)
-	}
-
-	// graph, err := getGraphInCollection(int64(id))
-	graph, err := getGraphInCollection(int64(id))
-
-	if err != nil {
-		log.Fatalf("Unable to get graph. %v", err)
-	}
-
-	json.NewEncoder(w).Encode(graph)
-}
-
 // UpdateGraph update graph's detail in the postgres db
 func UpdateGraph(w http.ResponseWriter, r *http.Request) {
 

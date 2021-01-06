@@ -32,6 +32,5 @@ func Router() *mux.Router {
 	router.HandleFunc("/editor/collection", middleware.CreateCollection).Methods("POST", "OPTIONS")
 	router.HandleFunc("/editor/collection", middleware.GetAllCollection).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/collection/{id}", middleware.DeleteCollection).Methods("DELETE", "OPTIONS")
-	router.HandleFunc("/editor/collection/graph/{id}", middleware.GetGraphInCollection).Methods("GET", "OPTIONS")
 	return router
 }
