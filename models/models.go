@@ -28,7 +28,7 @@ type Task struct {
 type Graph struct {
 	ID           int64           `json:"id"`
 	MapVerID     string          `json:"mapVerID"`
-	CollectionID string          `json:"collectionID"`
+	CollectionID int64           `json:"collectionID"`
 	Scale        float32         `json:"scale"`
 	Name         string          `json:"name"`
 	Location     string          `json:"location"`
@@ -40,7 +40,7 @@ type Graph struct {
 // GraphNonDetailed schema of the graph table with less details
 type GraphNonDetailed struct {
 	ID           int64  `json:"id"`
-	CollectionID string `json:"collectionID"`
+	CollectionID int64  `json:"collectionID"`
 	Name         string `json:"name"`
 	Location     string `json:"location"`
 }
