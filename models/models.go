@@ -26,26 +26,27 @@ type Task struct {
 
 // Graph schema of the graph table
 type Graph struct {
-	ID       int64           `json:"id"`
-	MapVerID string          `json:"mapVerID"`
-	Scale    float32         `json:"scale"`
-	Name     string          `json:"name"`
-	Location string          `json:"location"`
-	Level    string          `json:"level"`
-	Lanes    json.RawMessage `json:"lanes"`
-	Vertices json.RawMessage `json:"vertices"`
+	ID           int64           `json:"id"`
+	MapVerID     string          `json:"mapVerID"`
+	CollectionID string          `json:"collectionID"`
+	Scale        float32         `json:"scale"`
+	Name         string          `json:"name"`
+	Location     string          `json:"location"`
+	Level        string          `json:"level"`
+	Lanes        json.RawMessage `json:"lanes"`
+	Vertices     json.RawMessage `json:"vertices"`
 }
 
 // GraphNonDetailed schema of the graph table with less details
 type GraphNonDetailed struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Location string `json:"location"`
+	ID           int64  `json:"id"`
+	CollectionID string `json:"collectionID"`
+	Name         string `json:"name"`
+	Location     string `json:"location"`
 }
 
 // Collection schema of the graph table with less details
 type Collection struct {
-	ID          int64           `json:"id"`
-	Name        string          `json:"name"`
-	LinkedGraph json.RawMessage `json:"linkedGraph"`
+	ID   int64  `json:"id"`
+	Name string `json:"name"`
 }

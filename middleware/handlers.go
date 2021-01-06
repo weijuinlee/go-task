@@ -12,6 +12,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
+
+	// pq lib
 	_ "github.com/lib/pq"
 )
 
@@ -446,13 +448,13 @@ func insertGraph(graph models.Graph) int64 {
 
 	// create the insert sql query
 	// returning graphid will return the id of the inserted graph
-	sqlStatement := `INSERT INTO graphs (mapVerID, scale, name, location, level, lanes, vertices) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING graphid`
+	sqlStatement := `INSERT INTO graphs (mapVerID, collectionID, scale, name, location, level, lanes, vertices) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING graphid`
 
 	var id int64
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, graph.MapVerID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices).Scan(&id)
+	err := db.QueryRow(sqlStatement, graph.MapVerID, graph.CollectionID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -497,13 +499,13 @@ func insertCollection(collection models.Collection) int64 {
 
 	// create the insert sql query
 	// returning graphid will return the id of the inserted graph
-	sqlStatement := `INSERT INTO collections (name, linkedGraph) VALUES ($1, $2) RETURNING collectionid`
+	sqlStatement := `INSERT INTO collections (name) VALUES ($1) RETURNING collectionid`
 
 	var id int64
 
 	// execute the sql statement
 	// Scan function will save the insert id in the id
-	err := db.QueryRow(sqlStatement, collection.Name, collection.LinkedGraph).Scan(&id)
+	err := db.QueryRow(sqlStatement, collection.Name).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -579,7 +581,7 @@ func getGraph(id int64) (models.Graph, error) {
 
 	row := db.QueryRow(sqlStatement, id)
 
-	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
 
 	switch err {
 	case sql.ErrNoRows:
@@ -681,7 +683,7 @@ func getAllGraphNonDetailed() ([]models.GraphNonDetailed, error) {
 
 		var graph models.GraphNonDetailed
 
-		err = rows.Scan(&graph.ID, &graph.Name, &graph.Location)
+		err = rows.Scan(&graph.ID, &graph.CollectionID, &graph.Name, &graph.Location)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -861,7 +863,7 @@ func getAllCollection() ([]models.Collection, error) {
 
 		var collection models.Collection
 
-		err = rows.Scan(&collection.ID, &collection.Name, &collection.LinkedGraph)
+		err = rows.Scan(&collection.ID, &collection.Name)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -881,9 +883,9 @@ func updateGraph(id int64, graph models.Graph) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `UPDATE graphs SET mapVerID=$2, scale=$3, name=$4, location=$5, level=$6, lanes=$7, vertices=$8 WHERE graphid=$1`
+	sqlStatement := `UPDATE graphs SET mapVerID=$2, collecctionID=$3, scale=$4, name=$5, location=$6, level=$7, lanes=$8, vertices=$9 WHERE graphid=$1`
 
-	res, err := db.Exec(sqlStatement, id, graph.MapVerID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices)
+	res, err := db.Exec(sqlStatement, id, graph.MapVerID, graph.CollectionID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
