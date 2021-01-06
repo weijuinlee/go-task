@@ -647,7 +647,7 @@ func getAllGraphDetailed() ([]models.Graph, error) {
 
 		var graph models.Graph
 
-		err = rows.Scan(&graph.ID, &graph.MapVerID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+		err = rows.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -669,7 +669,7 @@ func getAllGraphNonDetailed() ([]models.GraphNonDetailed, error) {
 
 	var graphs []models.GraphNonDetailed
 
-	sqlStatement := `SELECT graphid, name, location FROM graphs`
+	sqlStatement := `SELECT graphid, collectionID, name, location FROM graphs`
 
 	rows, err := db.Query(sqlStatement)
 
