@@ -928,58 +928,6 @@ func getAllCollection() ([]models.Collection, error) {
 	return collections, err
 }
 
-// get all graph in the same collection from the DB
-func getGraphInCollection(id int64) (models.Graph, error) {
-
-	db := createConnection()
-
-	defer db.Close()
-
-	var graph models.Graph
-
-	sqlStatement := `SELECT graphid, collectionID FROM graphs WHERE collectionid=$1`
-
-	row := db.QueryRow(sqlStatement, id)
-
-	err := row.Scan(&graph.ID, &graph.CollectionID)
-
-	switch err {
-	case sql.ErrNoRows:
-		fmt.Println("No rows were returned!")
-		return graph, nil
-	case nil:
-		return graph, nil
-	default:
-		log.Fatalf("Unable to scan the row. %v", err)
-	}
-
-	return graph, err
-	// rows, err := db.Query(sqlStatement)
-	// row := db.QueryRow(sqlStatement, id)
-
-	// if err != nil {
-	// 	log.Fatalf("Unable to execute the query. %v", err)
-	// }
-
-	// defer rows.Close()
-
-	// for rows.Next() {
-
-	// 	var graph models.Graph
-
-	// 	err = rows.Scan(&graph.ID, &graph.CollectionID, &graph.Name, &graph.Location)
-
-	// 	if err != nil {
-	// 		log.Fatalf("Unable to scan the row. %v", err)
-	// 	}
-
-	// 	graphs = append(graphs, graph)
-
-	// }
-
-	// return graphs, err
-}
-
 // update graph in the DB
 func updateGraph(id int64, graph models.Graph) int64 {
 
