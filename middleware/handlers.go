@@ -286,6 +286,27 @@ func GetAllCollection(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// GetGraphInCollection will return all the graphs
+func GetGraphInCollection(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	// graph, err := getGraphInCollection(int64(id))
+	graph, err := getGraphInCollection(int64(id))
+
+	if err != nil {
+		log.Fatalf("Unable to get graph. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(graph)
+}
+
 // UpdateGraph update graph's detail in the postgres db
 func UpdateGraph(w http.ResponseWriter, r *http.Request) {
 
@@ -431,6 +452,29 @@ func DeleteTask(w http.ResponseWriter, r *http.Request) {
 	deletedRows := deleteTask(int64(id))
 
 	msg := fmt.Sprintf("Task deleted successfully. Total rows/record affected %v", deletedRows)
+
+	res := response{
+		ID:      int64(id),
+		Message: msg,
+	}
+
+	json.NewEncoder(w).Encode(res)
+}
+
+// DeleteCollection delete collection's detail in the postgres db
+func DeleteCollection(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	deletedRows := deleteCollection(int64(id))
+
+	msg := fmt.Sprintf("Collection deleted successfully. Total rows/record affected %v", deletedRows)
 
 	res := response{
 		ID:      int64(id),
@@ -876,6 +920,58 @@ func getAllCollection() ([]models.Collection, error) {
 	return collections, err
 }
 
+// get all graph in the same collection from the DB
+func getGraphInCollection(id int64) (models.Graph, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var graph models.Graph
+
+	sqlStatement := `SELECT graphid, collectionID FROM graphs WHERE collectionid=$1`
+
+	row := db.QueryRow(sqlStatement, id)
+
+	err := row.Scan(&graph.ID, &graph.CollectionID)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return graph, nil
+	case nil:
+		return graph, nil
+	default:
+		log.Fatalf("Unable to scan the row. %v", err)
+	}
+
+	return graph, err
+	// rows, err := db.Query(sqlStatement)
+	// row := db.QueryRow(sqlStatement, id)
+
+	// if err != nil {
+	// 	log.Fatalf("Unable to execute the query. %v", err)
+	// }
+
+	// defer rows.Close()
+
+	// for rows.Next() {
+
+	// 	var graph models.Graph
+
+	// 	err = rows.Scan(&graph.ID, &graph.CollectionID, &graph.Name, &graph.Location)
+
+	// 	if err != nil {
+	// 		log.Fatalf("Unable to scan the row. %v", err)
+	// 	}
+
+	// 	graphs = append(graphs, graph)
+
+	// }
+
+	// return graphs, err
+}
+
 // update graph in the DB
 func updateGraph(id int64, graph models.Graph) int64 {
 
@@ -954,7 +1050,7 @@ func deleteGraph(id int64) int64 {
 	return rowsAffected
 }
 
-// delete graph in the DB
+// delete patrol in the DB
 func deletePatrol(id int64) int64 {
 
 	db := createConnection()
@@ -1029,6 +1125,36 @@ func deleteTask(id int64) int64 {
 
 	if err != nil {
 		log.Fatalf("Error while checking the affected rows. %v", err)
+	}
+
+	fmt.Println("Total rows/record affected ", rowsAffected)
+
+	return rowsAffected
+}
+
+// delete collection in the DB
+func deleteCollection(id int64) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	sqlStatement := `DELETE FROM collections WHERE collectionid=$1`
+
+	res, err := db.Exec(sqlStatement, id)
+
+	if err != nil {
+
+		log.Fatalf("Unable to execute the query. %v", err)
+
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+
+		log.Fatalf("Error while checking the affected rows. %v", err)
+
 	}
 
 	fmt.Println("Total rows/record affected ", rowsAffected)
