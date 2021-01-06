@@ -31,7 +31,7 @@ type Graph struct {
 	Scale    float32         `json:"scale"`
 	Name     string          `json:"name"`
 	Location string          `json:"location"`
-	Level    int64           `json:"level"`
+	Level    string          `json:"level"`
 	Lanes    json.RawMessage `json:"lanes"`
 	Vertices json.RawMessage `json:"vertices"`
 }
@@ -41,4 +41,11 @@ type GraphNonDetailed struct {
 	ID       int64  `json:"id"`
 	Name     string `json:"name"`
 	Location string `json:"location"`
+}
+
+// Collection schema of the graph table with less details
+type Collection struct {
+	ID          int64           `json:"id"`
+	Name        string          `json:"name"`
+	LinkedGraph json.RawMessage `json:"linkedGraph"`
 }

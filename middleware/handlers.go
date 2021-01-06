@@ -134,6 +134,28 @@ func CreateRobot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// CreateCollection create a user in the postgres db
+func CreateCollection(w http.ResponseWriter, r *http.Request) {
+
+	var collection models.Collection
+
+	err := json.NewDecoder(r.Body).Decode(&collection)
+
+	if err != nil {
+
+		panic("Unable to decode the request body.")
+
+	}
+
+	insertID := insertCollection(collection)
+
+	res := response{
+		ID:      insertID,
+		Message: "Collection created successfully",
+	}
+	json.NewEncoder(w).Encode(res)
+}
+
 // GetGraph will return a single graph by its id
 func GetGraph(w http.ResponseWriter, r *http.Request) {
 
@@ -240,6 +262,19 @@ func GetAllPatrolTasks(w http.ResponseWriter, r *http.Request) {
 func GetAllGotoTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := getAllGotoTasks()
+
+	if err != nil {
+		log.Fatalf("Unable to get all tasks. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(tasks)
+
+}
+
+// GetAllCollection will return all tasks
+func GetAllCollection(w http.ResponseWriter, r *http.Request) {
+
+	tasks, err := getAllCollection()
 
 	if err != nil {
 		log.Fatalf("Unable to get all tasks. %v", err)
@@ -444,6 +479,31 @@ func insertPatrol(patrol models.Patrol) int64 {
 	// execute the sql statement
 	// Scan function will save the insert id in the id
 	err := db.QueryRow(sqlStatement, patrol.GraphID, patrol.MapVerID, patrol.Name, patrol.Points).Scan(&id)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	fmt.Println("Inserted a single record as id:", id)
+
+	return id
+}
+
+func insertCollection(collection models.Collection) int64 {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	// create the insert sql query
+	// returning graphid will return the id of the inserted graph
+	sqlStatement := `INSERT INTO collections (name, linkedGraph) VALUES ($1, $2) RETURNING collectionid`
+
+	var id int64
+
+	// execute the sql statement
+	// Scan function will save the insert id in the id
+	err := db.QueryRow(sqlStatement, collection.Name, collection.LinkedGraph).Scan(&id)
 
 	if err != nil {
 		log.Fatalf("Unable to execute the query. %v", err)
@@ -776,6 +836,42 @@ func getAllGotoTasks() ([]models.Task, error) {
 	}
 
 	return tasks, err
+}
+
+// get all collection from the DB
+func getAllCollection() ([]models.Collection, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var collections []models.Collection
+
+	sqlStatement := `SELECT * FROM collections`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var collection models.Collection
+
+		err = rows.Scan(&collection.ID, &collection.Name, &collection.LinkedGraph)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		collections = append(collections, collection)
+
+	}
+
+	return collections, err
 }
 
 // update graph in the DB

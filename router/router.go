@@ -29,6 +29,8 @@ func Router() *mux.Router {
 	router.HandleFunc("/editor/task/{id}", middleware.DeleteTask).Methods("DELETE", "OPTIONS")
 	router.HandleFunc("/editor/task/patrol", middleware.GetAllPatrolTasks).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/task/goto", middleware.GetAllGotoTasks).Methods("GET", "OPTIONS")
+	router.HandleFunc("/editor/collection", middleware.CreateCollection).Methods("POST", "OPTIONS")
+	router.HandleFunc("/editor/collection", middleware.GetAllCollection).Methods("GET", "OPTIONS")
 
 	return router
 }
