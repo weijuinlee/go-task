@@ -228,7 +228,7 @@ func GetAllPatrol(w http.ResponseWriter, r *http.Request) {
 	patrols, err := getAllPatrol()
 
 	if err != nil {
-		log.Fatalf("Unable to get all graph. %v", err)
+		log.Fatalf("Unable to get all patrol. %v", err)
 	}
 
 	json.NewEncoder(w).Encode(patrols)
