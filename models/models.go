@@ -5,7 +5,7 @@ import "encoding/json"
 // Patrol schema of the patrol table
 type Patrol struct {
 	ID       int64           `json:"id"`
-	GraphID  int             `json:"graphID"`
+	GraphID  int64           `json:"graphID"`
 	MapVerID string          `json:"mapVerID"`
 	Name     string          `json:"name"`
 	Points   json.RawMessage `json:"points"`
@@ -17,7 +17,7 @@ type Robot struct {
 	Name    string `json:"name"`
 }
 
-// Task schema of the robot table
+// Task schema of the task table
 type Task struct {
 	ID          int64           `json:"id"`
 	Type        int64           `json:"type"`
