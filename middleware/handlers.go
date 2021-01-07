@@ -741,7 +741,7 @@ func getAllPatrol() ([]models.Patrol, error) {
 	rows, err := db.Query(sqlStatement)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		log.Fatalf("Unable to execute the query there. %v", err)
 	}
 
 	defer rows.Close()
@@ -945,7 +945,7 @@ func updatePatrol(id int64, patrol models.Patrol) int64 {
 	res, err := db.Exec(sqlStatement, id, patrol.GraphID, patrol.MapVerID, patrol.Name, patrol.Points)
 
 	if err != nil {
-		log.Fatalf("Unable to execute the query. %v", err)
+		log.Fatalf("Unable to execute the query here. %v", err)
 	}
 
 	rowsAffected, err := res.RowsAffected()
