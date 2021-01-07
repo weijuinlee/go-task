@@ -640,7 +640,7 @@ func getGraph(id int64) (models.Graph, error) {
 
 	row := db.QueryRow(sqlStatement, id)
 
-	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
+	err := row.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
 
 	switch err {
 	case sql.ErrNoRows:
