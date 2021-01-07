@@ -591,42 +591,6 @@ func insertTask(task models.Task) int64 {
 	return id
 }
 
-// // get one graph from the DB by its id
-// func getGraph(id int64) ([]models.Graph, error) {
-
-// 	db := createConnection()
-
-// 	defer db.Close()
-
-// 	var graphs models.Graph
-
-// 	sqlStatement := `SELECT * FROM graphs WHERE graphid=$1`
-
-// 	rows, err := db.Query(sqlStatement, id)
-
-// 	if err != nil {
-// 		log.Fatalf("Unable to execute the query. %v", err)
-// 	}
-
-// 	defer rows.Close()
-
-// 	for rows.Next() {
-
-// 		var graph models.Graph
-
-// 		err = rows.Scan(&graph.ID, &graph.MapVerID, &graph.CollectionID, &graph.Scale, &graph.Name, &graph.Location, &graph.Level, &graph.Lanes, &graph.Vertices)
-
-// 		if err != nil {
-// 			log.Fatalf("Unable to scan the row. %v", err)
-// 		}
-
-// 		graphs = append(graphs, graph)
-
-// 	}
-
-// 	return graphs, err
-// }
-
 // get one graph from the DB by its id
 func getGraph(id int64) (models.Graph, error) {
 
