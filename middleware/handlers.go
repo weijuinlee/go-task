@@ -48,7 +48,7 @@ func createConnection() *sql.DB {
 	return db
 }
 
-// CreatePatrol create a user in the postgres db
+// CreatePatrol create a patrol in the postgres db
 func CreatePatrol(w http.ResponseWriter, r *http.Request) {
 
 	var patrol models.Patrol
@@ -92,7 +92,7 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// CreateGraph create a user in the postgres db
+// CreateGraph create a graph in the postgres db
 func CreateGraph(w http.ResponseWriter, r *http.Request) {
 
 	var graph models.Graph
@@ -136,7 +136,7 @@ func CreateRobot(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-// CreateCollection create a user in the postgres db
+// CreateCollection create a collection in the postgres db
 func CreateCollection(w http.ResponseWriter, r *http.Request) {
 
 	var collection models.Collection
@@ -178,7 +178,7 @@ func GetGraph(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(graph)
 }
 
-// GetAllGraphDetailed will return all the graphs
+// GetAllGraphDetailed will return all the graphs in detail
 func GetAllGraphDetailed(w http.ResponseWriter, r *http.Request) {
 
 	graphs, err := getAllGraphDetailed()
@@ -190,7 +190,7 @@ func GetAllGraphDetailed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(graphs)
 }
 
-// GetAllGraphNonDetailed will return all the graphs
+// GetAllGraphNonDetailed will return all the graphs not in detail
 func GetAllGraphNonDetailed(w http.ResponseWriter, r *http.Request) {
 
 	graphs, err := getAllGraphNonDetailed()
@@ -202,7 +202,7 @@ func GetAllGraphNonDetailed(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(graphs)
 }
 
-// GetPatrol will return a single graph by its id
+// GetPatrol will return a single patrol by its id
 func GetPatrol(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
@@ -247,7 +247,7 @@ func GetAllRobots(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAllPatrolTasks will return all tasks
+// GetAllPatrolTasks will return all patrol tasks
 func GetAllPatrolTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := getAllPatrolTasks()
@@ -260,7 +260,7 @@ func GetAllPatrolTasks(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAllGotoTasks will return all tasks
+// GetAllGotoTasks will return all goto tasks
 func GetAllGotoTasks(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := getAllGotoTasks()
@@ -273,7 +273,7 @@ func GetAllGotoTasks(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// GetAllCollection will return all tasks
+// GetAllCollection will return all collections
 func GetAllCollection(w http.ResponseWriter, r *http.Request) {
 
 	tasks, err := getAllCollection()
@@ -463,6 +463,7 @@ func DeleteCollection(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
+// insert one graph in the DB
 func insertGraph(graph models.Graph) int64 {
 
 	db := createConnection()
@@ -514,6 +515,7 @@ func insertPatrol(patrol models.Patrol) int64 {
 	return id
 }
 
+// insert one collection in the DB
 func insertCollection(collection models.Collection) int64 {
 
 	db := createConnection()
@@ -565,7 +567,7 @@ func insertRobot(robot models.Robot) int64 {
 	return id
 }
 
-// insert one robot in the DB
+// insert one task in the DB
 func insertTask(task models.Task) int64 {
 
 	db := createConnection()
@@ -619,7 +621,7 @@ func getGraph(id int64) (models.Graph, error) {
 	return graph, err
 }
 
-// get one graph from the DB by its id
+// get one patrolfrom the DB by its id
 func getPatrol(id int64) (models.Patrol, error) {
 
 	db := createConnection()
@@ -628,7 +630,7 @@ func getPatrol(id int64) (models.Patrol, error) {
 
 	var patrol models.Patrol
 
-	sqlStatement := `SELECT * FROM patrols WHERE graphID=$1`
+	sqlStatement := `SELECT * FROM patrols WHERE graphid=$1`
 
 	row := db.QueryRow(sqlStatement, id)
 
@@ -647,7 +649,7 @@ func getPatrol(id int64) (models.Patrol, error) {
 	return patrol, err
 }
 
-// get all graph from the DB
+// get all graph in detail from the DB
 func getAllGraphDetailed() ([]models.Graph, error) {
 
 	db := createConnection()
@@ -683,7 +685,7 @@ func getAllGraphDetailed() ([]models.Graph, error) {
 	return graphs, err
 }
 
-// get all graph from the DB
+// get all graph not in detail from the DB
 func getAllGraphNonDetailed() ([]models.GraphNonDetailed, error) {
 
 	db := createConnection()
@@ -791,7 +793,7 @@ func getAllRobots() ([]models.Robot, error) {
 	return robots, err
 }
 
-// get all tasks from the DB
+// get all patrol task from the DB
 func getAllPatrolTasks() ([]models.Task, error) {
 
 	db := createConnection()
