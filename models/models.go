@@ -13,6 +13,7 @@ type Patrol struct {
 
 // Robot schema of the robot table
 type Robot struct {
+	ID      int64  `json:"id"`
 	RobotID string `json:"robotID"`
 	Name    string `json:"name"`
 }

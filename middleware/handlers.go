@@ -216,7 +216,7 @@ func GetPatrol(w http.ResponseWriter, r *http.Request) {
 	patrol, err := getPatrol(int64(id))
 
 	if err != nil {
-		log.Fatalf("Unable to get graph. %v", err)
+		log.Fatalf("Unable to get patrol. %v", err)
 	}
 
 	json.NewEncoder(w).Encode(patrol)
@@ -253,7 +253,7 @@ func GetAllPatrolTasks(w http.ResponseWriter, r *http.Request) {
 	tasks, err := getAllPatrolTasks()
 
 	if err != nil {
-		log.Fatalf("Unable to get all tasks. %v", err)
+		log.Fatalf("Unable to get all patrol tasks. %v", err)
 	}
 
 	json.NewEncoder(w).Encode(tasks)
@@ -266,7 +266,7 @@ func GetAllGotoTasks(w http.ResponseWriter, r *http.Request) {
 	tasks, err := getAllGotoTasks()
 
 	if err != nil {
-		log.Fatalf("Unable to get all tasks. %v", err)
+		log.Fatalf("Unable to get all goto tasks. %v", err)
 	}
 
 	json.NewEncoder(w).Encode(tasks)
@@ -279,7 +279,7 @@ func GetAllCollection(w http.ResponseWriter, r *http.Request) {
 	tasks, err := getAllCollection()
 
 	if err != nil {
-		log.Fatalf("Unable to get all tasks. %v", err)
+		log.Fatalf("Unable to get all collections. %v", err)
 	}
 
 	json.NewEncoder(w).Encode(tasks)
@@ -405,7 +405,7 @@ func DeleteRobot(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("Unable to convert the string into int.  %v", err)
 	}
 
-	deletedRows := deletePatrol(int64(id))
+	deletedRows := deleteRobot(int64(id))
 
 	msg := fmt.Sprintf("Robot deleted successfully. Total rows/record affected %v", deletedRows)
 
@@ -472,7 +472,7 @@ func insertGraph(graph models.Graph) int64 {
 
 	// create the insert sql query
 	// returning graphid will return the id of the inserted graph
-	sqlStatement := `INSERT INTO graphs (mapVerID, collectionID, scale, name, location, level, lanes, vertices) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING graphid`
+	sqlStatement := `INSERT INTO graphs ("mapVerID", "collectionID", scale, name, location, level, lanes, vertices) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING graphid`
 
 	var id int64
 
@@ -498,7 +498,7 @@ func insertPatrol(patrol models.Patrol) int64 {
 
 	// create the insert sql query
 	// returning patrolid will return the id of the inserted patrol
-	sqlStatement := `INSERT INTO patrols (graphID, mapVerID, name, points) VALUES ($1, $2, $3, $4) RETURNING patrolid`
+	sqlStatement := `INSERT INTO patrols ("graphID", "mapVerID", name, points) VALUES ($1, $2, $3, $4) RETURNING patrolid`
 
 	var id int64
 
@@ -550,7 +550,7 @@ func insertRobot(robot models.Robot) int64 {
 
 	// create the insert sql query
 	// returning robotid will return the id of the inserted patrol
-	sqlStatement := `INSERT INTO robots (robotID, name) VALUES ($1, $2) RETURNING id`
+	sqlStatement := `INSERT INTO robots ("robotID", name) VALUES ($1, $2) RETURNING id`
 
 	var id int64
 
@@ -576,7 +576,7 @@ func insertTask(task models.Task) int64 {
 
 	// create the insert sql query
 	// returning id will return the id of the inserted task
-	sqlStatement := `INSERT INTO tasks (type, taskDetails) VALUES ($1, $2) RETURNING taskID`
+	sqlStatement := `INSERT INTO tasks (type, "taskDetails") VALUES ($1, $2) RETURNING id`
 
 	var id int64
 
@@ -630,7 +630,7 @@ func getPatrol(id int64) (models.Patrol, error) {
 
 	var patrol models.Patrol
 
-	sqlStatement := `SELECT * FROM patrols WHERE graphid=$1`
+	sqlStatement := `SELECT * FROM patrols WHERE "graphID"=$1`
 
 	row := db.QueryRow(sqlStatement, id)
 
@@ -694,7 +694,7 @@ func getAllGraphNonDetailed() ([]models.GraphNonDetailed, error) {
 
 	var graphs []models.GraphNonDetailed
 
-	sqlStatement := `SELECT graphid, collectionID, name, location FROM graphs`
+	sqlStatement := `SELECT graphid, "collectionID", name, location FROM graphs`
 
 	rows, err := db.Query(sqlStatement)
 
@@ -766,7 +766,7 @@ func getAllRobots() ([]models.Robot, error) {
 
 	var robots []models.Robot
 
-	sqlStatement := `SELECT robotID,name FROM robots`
+	sqlStatement := `SELECT * FROM robots`
 
 	rows, err := db.Query(sqlStatement)
 
@@ -780,7 +780,7 @@ func getAllRobots() ([]models.Robot, error) {
 
 		var robot models.Robot
 
-		err = rows.Scan(&robot.RobotID, &robot.Name)
+		err = rows.Scan(&robot.ID, &robot.RobotID, &robot.Name)
 
 		if err != nil {
 			log.Fatalf("Unable to scan the row. %v", err)
@@ -908,7 +908,7 @@ func updateGraph(id int64, graph models.Graph) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `UPDATE graphs SET mapVerID=$2, collectionID=$3, scale=$4, name=$5, location=$6, level=$7, lanes=$8, vertices=$9 WHERE graphid=$1`
+	sqlStatement := `UPDATE graphs SET "mapVerID"=$2, "collectionID"=$3, scale=$4, name=$5, location=$6, level=$7, lanes=$8, vertices=$9 WHERE graphid=$1`
 
 	res, err := db.Exec(sqlStatement, id, graph.MapVerID, graph.CollectionID, graph.Scale, graph.Name, graph.Location, graph.Level, graph.Lanes, graph.Vertices)
 
@@ -922,7 +922,7 @@ func updateGraph(id int64, graph models.Graph) int64 {
 		log.Fatalf("Error while checking the affected rows. %v", err)
 	}
 
-	fmt.Printf("Total rows/record affected %v", rowsAffected)
+	fmt.Printf("Total rows/record affected %v. ", rowsAffected)
 
 	return rowsAffected
 }
@@ -934,7 +934,7 @@ func updatePatrol(id int64, patrol models.Patrol) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `UPDATE patrols SET graphID=$2, mapVerID=$3, name=$4, points=$5 WHERE patrolid=$1`
+	sqlStatement := `UPDATE patrols SET "graphID"=$2, "mapVerID"=$3, name=$4, points=$5 WHERE patrolid=$1`
 
 	res, err := db.Exec(sqlStatement, id, patrol.GraphID, patrol.MapVerID, patrol.Name, patrol.Points)
 
@@ -948,7 +948,7 @@ func updatePatrol(id int64, patrol models.Patrol) int64 {
 		log.Fatalf("Error while checking the affected rows. %v", err)
 	}
 
-	fmt.Printf("Total rows/record affected %v", rowsAffected)
+	fmt.Printf("Total rows/record affected %v. ", rowsAffected)
 
 	return rowsAffected
 }
@@ -974,7 +974,7 @@ func deleteGraph(id int64) int64 {
 		log.Fatalf("Error while checking the affected rows. %v", err)
 	}
 
-	fmt.Println("Total rows/record affected ", rowsAffected)
+	fmt.Println("Total rows/record affected", rowsAffected)
 
 	return rowsAffected
 }
