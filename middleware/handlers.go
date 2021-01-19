@@ -1042,7 +1042,7 @@ func deleteTask(id int64) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `DELETE FROM tasks WHERE id=$1`
+	sqlStatement := `DELETE FROM tasks WHERE taskID=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
