@@ -550,7 +550,7 @@ func insertRobot(robot models.Robot) int64 {
 
 	// create the insert sql query
 	// returning robotid will return the id of the inserted patrol
-	sqlStatement := `INSERT INTO robots ("robotID", name) VALUES ($1, $2) RETURNING id`
+	sqlStatement := `INSERT INTO robots ("robotID", name) VALUES ($1, $2) RETURNING robotid`
 
 	var id int64
 
