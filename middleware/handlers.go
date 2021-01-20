@@ -50,7 +50,7 @@ func createConnection() *sql.DB {
 
 // AppRunning test if running
 func AppRunning(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
+	if r.URL.Path != "/apprunning" {
 		http.Error(w, "404 not found.", http.StatusNotFound)
 		return
 	}
