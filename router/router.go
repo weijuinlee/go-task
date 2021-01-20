@@ -11,7 +11,7 @@ func Router() *mux.Router {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/apprunning", middleware.AppRunning).Methods("GET", "OPTIONS")
+	router.HandleFunc("/running", middleware.AppRunning).Methods("GET", "OPTIONS")
 
 	router.HandleFunc("/editor/graph/detailed/{id}", middleware.GetGraph).Methods("GET", "OPTIONS")
 	router.HandleFunc("/editor/graph/detailed", middleware.GetAllGraphDetailed).Methods("GET", "OPTIONS")
