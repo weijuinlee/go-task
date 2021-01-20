@@ -48,6 +48,21 @@ func createConnection() *sql.DB {
 	return db
 }
 
+// AppRunning test if running
+func AppRunning(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, "404 not found.", http.StatusNotFound)
+		return
+	}
+
+	if r.Method != "GET" {
+		http.Error(w, "Method is not supported.", http.StatusNotFound)
+		return
+	}
+
+	fmt.Fprintf(w, "App is running!")
+}
+
 // CreatePatrol create a patrol in the postgres db
 func CreatePatrol(w http.ResponseWriter, r *http.Request) {
 
