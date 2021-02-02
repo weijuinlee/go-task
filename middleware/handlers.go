@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"io/ioutil"
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -100,10 +102,13 @@ func CreateTask(w http.ResponseWriter, r *http.Request) {
 
 	insertID := insertTask(task)
 
+	notifyTrafficController(insertID)
+
 	res := response{
 		ID:      insertID,
 		Message: "Task created successfully",
 	}
+
 	json.NewEncoder(w).Encode(res)
 }
 
@@ -237,6 +242,27 @@ func GetPatrol(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(patrol)
 }
 
+// GetTask will return a single task by its id
+func GetTask(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+
+	id, err := strconv.Atoi(params["id"])
+
+	if err != nil {
+		log.Fatalf("Unable to convert the string into int.  %v", err)
+	}
+
+	task, err := getTask(int64(id))
+
+	if err != nil {
+		log.Fatalf("Unable to get patrol. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(task)
+}
+
+
 // GetAllPatrol will return all the patrols
 func GetAllPatrol(w http.ResponseWriter, r *http.Request) {
 
@@ -259,6 +285,19 @@ func GetAllRobots(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(robots)
+
+}
+
+// GetAllTasks will return all goto tasks
+func GetAllTasks(w http.ResponseWriter, r *http.Request) {
+
+	tasks, err := getAllTasks()
+
+	if err != nil {
+		log.Fatalf("Unable to get all goto tasks. %v", err)
+	}
+
+	json.NewEncoder(w).Encode(tasks)
 
 }
 
@@ -591,7 +630,7 @@ func insertTask(task models.Task) int64 {
 
 	// create the insert sql query
 	// returning id will return the id of the inserted task
-	sqlStatement := `INSERT INTO tasks (type, "taskDetails") VALUES ($1, $2) RETURNING id`
+	sqlStatement := `INSERT INTO tasks (type, "taskDetails") VALUES ($1, $2) RETURNING taskid`
 
 	var id int64
 
@@ -662,6 +701,34 @@ func getPatrol(id int64) (models.Patrol, error) {
 	}
 
 	return patrol, err
+}
+
+// get one graph from the DB by its id
+func getTask(id int64) (models.Task, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var task models.Task
+
+	sqlStatement := `SELECT * FROM tasks WHERE taskid=$1`
+
+	row := db.QueryRow(sqlStatement, id)
+
+	err := row.Scan(&task.ID, &task.Type, &task.TaskDetails)
+
+	switch err {
+	case sql.ErrNoRows:
+		fmt.Println("No rows were returned!")
+		return task, nil
+	case nil:
+		return task, nil
+	default:
+		log.Fatalf("Unable to scan the row. %v", err)
+	}
+
+	return task, err
 }
 
 // get all graph in detail from the DB
@@ -806,6 +873,42 @@ func getAllRobots() ([]models.Robot, error) {
 	}
 
 	return robots, err
+}
+
+// get all patrol task from the DB
+func getAllTasks() ([]models.Task, error) {
+
+	db := createConnection()
+
+	defer db.Close()
+
+	var tasks []models.Task
+
+	sqlStatement := `SELECT * FROM tasks`
+
+	rows, err := db.Query(sqlStatement)
+
+	if err != nil {
+		log.Fatalf("Unable to execute the query. %v", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var task models.Task
+
+		err = rows.Scan(&task.ID, &task.Type, &task.TaskDetails)
+
+		if err != nil {
+			log.Fatalf("Unable to scan the row. %v", err)
+		}
+
+		tasks = append(tasks, task)
+
+	}
+
+	return tasks, err
 }
 
 // get all patrol task from the DB
@@ -1105,3 +1208,61 @@ func deleteCollection(id int64) int64 {
 
 	return rowsAffected
 }
+
+// notifyTrafficController notifies traffic controller when new task is added
+func notifyTrafficController(insertID int64) string {
+
+	str := strconv.FormatInt(insertID, 10)
+	fmt.Println(str)  // Prints "32"
+	values := map[string]string{"taskID":str}
+	requestBody, err := json.Marshal(values)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	resp, err := http.Post("http://18.140.162.221:3003/enqueue", "application/json",
+		bytes.NewBuffer(requestBody))
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	log.Println(string(body))
+
+	return string(body)
+}
+// 	var res map[string]interface{}
+
+// 	json.NewDecoder(resp.Body).Decode(&res)
+
+// 	return resp
+// }
+
+// responseBody := bytes.NewBuffer(postBody)
+// //Leverage Go's HTTP Post function to make request
+//    resp, err := http.Post("http://localhost:5000/enqueue", "application/json", responseBody)
+// //Handle Error
+//    if err != nil {
+//       log.Fatalf("An Error Occured %v", err)
+//    }
+//    defer resp.Body.Close()
+// //Read the response body
+//    body, err := ioutil.ReadAll(resp.Body)
+
+//    if err != nil {
+//       log.Fatalln(err)
+//    }
+
+//    sb := string(body)
+//    log.Printf(sb)
+//    return "Notified"
+// }
