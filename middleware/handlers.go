@@ -1134,7 +1134,7 @@ func deleteRobot(id int64) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `DELETE FROM robots WHERE id=$1`
+	sqlStatement := `DELETE FROM robots WHERE robotid=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
@@ -1160,7 +1160,7 @@ func deleteTask(id int64) int64 {
 
 	defer db.Close()
 
-	sqlStatement := `DELETE FROM tasks WHERE id=$1`
+	sqlStatement := `DELETE FROM tasks WHERE taskid=$1`
 
 	res, err := db.Exec(sqlStatement, id)
 
@@ -1213,7 +1213,6 @@ func deleteCollection(id int64) int64 {
 func notifyTrafficController(insertID int64) string {
 
 	str := strconv.FormatInt(insertID, 10)
-	fmt.Println(str)  // Prints "32"
 	values := map[string]string{"taskID":str}
 	requestBody, err := json.Marshal(values)
 
@@ -1236,33 +1235,5 @@ func notifyTrafficController(insertID int64) string {
 		log.Fatalln(err)
 	}
 
-	log.Println(string(body))
-
 	return string(body)
 }
-// 	var res map[string]interface{}
-
-// 	json.NewDecoder(resp.Body).Decode(&res)
-
-// 	return resp
-// }
-
-// responseBody := bytes.NewBuffer(postBody)
-// //Leverage Go's HTTP Post function to make request
-//    resp, err := http.Post("http://localhost:5000/enqueue", "application/json", responseBody)
-// //Handle Error
-//    if err != nil {
-//       log.Fatalf("An Error Occured %v", err)
-//    }
-//    defer resp.Body.Close()
-// //Read the response body
-//    body, err := ioutil.ReadAll(resp.Body)
-
-//    if err != nil {
-//       log.Fatalln(err)
-//    }
-
-//    sb := string(body)
-//    log.Printf(sb)
-//    return "Notified"
-// }
