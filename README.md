@@ -193,7 +193,7 @@ Description: Create a task
       "timeStamp": "2019-02-28T01:28:51.833977+08:00",
       "robotQuantity": 1,
       "robots": [
-         "id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"
+         {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"}
       ]
    }
 }
@@ -207,7 +207,7 @@ Description: Create a task
       "locationID": 1,
       "priority": 1,
       "end": "0",
-      "positionName" : {"0", "1"},
+      "positionName" : ["0", "1"],
       "timeStamp": "2019-02-28T01:28:51.833977+08:00",
       "robotQuantity": 4,
       "robots": [
