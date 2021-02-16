@@ -2,8 +2,6 @@
 
 Docker image available on dockerhub: docker pull weijuin/go-task:v1.9
 
-Git clone[https://github.com/weijuinlee/go-task.git]
-
 <br>
 
 ## Graph 
@@ -28,7 +26,7 @@ Description: Update one graph
    "scale": 0.05,
    "Location": "NCS A1",
    "Building": "NCS",
-   "level": "1":,
+   "level": "1",
    "lanes": {
        "0.0": {"1.0": 58.54130575371151},
        "0.1": {"1.0": 58.54130575371151},
