@@ -184,15 +184,16 @@ Description: Create a task
 {
    "type": 1,
    "taskDetails":{
-   "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
-   "locationID": 1,      
-   "priority": 1,
-   "positionName" : ["0", "1"]
-   "timeStamp": "2019-02-28T01:28:51.833977+08:00"
-	"robotQuantity": 1
-   "robots": [
-      "id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"}
-   ]
+      "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
+      "locationID": 1,      
+      "priority": 1,
+      "positionName" : ["0", "1"],
+      "timeStamp": "2019-02-28T01:28:51.833977+08:00",
+      "robotQuantity": 1,
+      "robots": [
+         "id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"
+      ]
+   }
 }
 ```
 
@@ -200,19 +201,20 @@ Description: Create a task
 {
    "type": 0,
    "taskDetails":{
-   "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
-   "locationID": 1,
-   "priority": 1,
-   "end": "0",
-   "positionName" : {"0", "1"}
-   "timeStamp": "2019-02-28T01:28:51.833977+08:00"
-   “robotQuantity”: 4
-   "robots": [
-      {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
-      {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"},
-      {"id":3,"robotID":"1c60248b-80cc-4427-90a6-885ddcf6f8de"},
-      {"id":4,"robotID":"d0047237-8bac-473d-8c5e-ebc9f5f2367e"}
-   ]
+      "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
+      "locationID": 1,
+      "priority": 1,
+      "end": "0",
+      "positionName" : {"0", "1"},
+      "timeStamp": "2019-02-28T01:28:51.833977+08:00",
+      "robotQuantity": 4,
+      "robots": [
+         {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
+         {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"},
+         {"id":3,"robotID":"1c60248b-80cc-4427-90a6-885ddcf6f8de"},
+         {"id":4,"robotID":"d0047237-8bac-473d-8c5e-ebc9f5f2367e"}
+      ]
+   }
 }
 ```
 <br>
@@ -253,3 +255,46 @@ Description: Get all goto task
 ### 6. DELETE - /editor/task/<taskID>
 
 Description: Delete one collection
+
+### Task Scenarios
+
+Scenario 1: 
+
+```json
+{
+   "robotQuantity": 2,
+   "robots": [
+      {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
+      {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"}
+   ]
+}
+```
+**Number of unique robots corresponds to robot quantity**
+
+Scenario 2: 
+
+```json
+{
+   "robotQuantity": 5,
+   "robots": [
+      {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
+      {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"},
+      {"id":3,"robotID":"1c60248b-80cc-4427-90a6-885ddcf6f8de"}
+   ]
+}
+```
+**Number of unique robots does not match the robot quantity.Traffic Controller has to get other available robots to perform job**
+
+Scenario 3: 
+
+```json
+{
+   "robots": [
+      {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
+      {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"}
+   ]
+}
+```
+**Only robot IDs are provided**
+
+
