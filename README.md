@@ -4,7 +4,7 @@ Docker image available on dockerhub: docker pull weijuin/go-task:v1.9
 
 <br>
 
-### Graph 
+## Graph 
 
 <br>
 
@@ -54,10 +54,10 @@ Description: Update one graph
 <br>
 
 ### Attributes:
-"type": 0 = null
-"type": 1 = door
-"type": 2 = elevator
-"type": 3 = waiting point
+- "type": 0 = null
+- "type": 1 = door
+- "type": 2 = elevator
+- "type": 3 = waiting point
 **Parent node "0" has a capacity of 2. Child nodes are "0.0" and "0.1"**
 
 
@@ -87,7 +87,7 @@ Description: Delete one graph
 
 <br>
 
-### Collection
+## Collection
 
 <br>
 
@@ -117,7 +117,7 @@ Description: Delete one collection
 
 <br>
 
-### Patrol
+## Patrol
 
 <br>
 
@@ -160,7 +160,9 @@ Description: Get all patrol routes linked to one graph
 
 Description: Delete one patrol route
 
-### Robots
+<br>
+
+## Robots
 
 <br>
 
@@ -220,11 +222,11 @@ Description: Create a task
 <br>
 
 ### Attributes:
-"type": 0 = GOTO/Patrol
-"type": 1 = patrolArea
-"priority": 0 = LOW
-"priority": 1 = MED
-"priority": 2 = HIGH
+- "type": 0 = GOTO/Patrol
+- "type": 1 = patrolArea
+- "priority": 0 = LOW
+- "priority": 1 = MED
+- "priority": 2 = HIGH
 
 <br>
 
@@ -258,7 +260,7 @@ Description: Delete one collection
 
 <br>
 
-### Task Scenarios
+## Task Scenarios
 
 <br>
 
