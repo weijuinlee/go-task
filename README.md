@@ -4,7 +4,7 @@ Docker image available on dockerhub: docker pull weijuin/go-task:v1.9
 
 <br>
 
-## Graph 
+### Graph 
 
 <br>
 
@@ -87,7 +87,7 @@ Description: Delete one graph
 
 <br>
 
-## Collection
+### Collection
 
 <br>
 
@@ -117,7 +117,7 @@ Description: Delete one collection
 
 <br>
 
-## Patrol
+### Patrol
 
 <br>
 
@@ -160,7 +160,7 @@ Description: Get all patrol routes linked to one graph
 
 Description: Delete one patrol route
 
-## Robots
+### Robots
 
 <br>
 
@@ -169,3 +169,87 @@ Description: Delete one patrol route
 Description: Get all robots available
 
 <br>
+
+### Tasks
+
+<br>
+
+### 1. POST - /editor/task
+
+Description: Create a task
+
+<br>
+
+```json
+{
+   "type": 1,
+   "taskDetails":{
+   "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
+   "locationID": 1,      
+   "priority": 1,
+   "positionName" : ["0", "1"]
+   "timeStamp": "2019-02-28T01:28:51.833977+08:00"
+	"robotQuantity": 1
+   "robots": [
+      "id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"}
+   ]
+}
+```
+
+```json
+{
+   "type": 0,
+   "taskDetails":{
+   "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
+   "locationID": 1,
+   "priority": 1,
+   "end": "0",
+   "positionName" : {"0", "1"}
+   "timeStamp": "2019-02-28T01:28:51.833977+08:00"
+   “robotQuantity”: 4
+   "robots": [
+      {"id":1,"robotID":"aea55737-cc06-4627-a798-ae2450ea1376"},
+      {"id":2,"robotID":"278d24bc-c4d2-481f-bd32-9c320ccb3054"},
+      {"id":3,"robotID":"1c60248b-80cc-4427-90a6-885ddcf6f8de"},
+      {"id":4,"robotID":"d0047237-8bac-473d-8c5e-ebc9f5f2367e"}
+   ]
+}
+```
+<br>
+
+### Attributes:
+### "type": 0 = GOTO/Patrol
+### "type": 1 = patrolArea
+### "priority": 0 = LOW
+### "priority": 1 = MED
+### "priority": 2 = HIGH
+
+<br>
+
+### 2. GET - /editor/task
+
+Description: Get all task
+
+<br>
+
+### 3. GET - /editor/task/<taskID>
+
+Description: Get one task
+
+<br>
+
+### 4. GET - /editor/task/patrol
+
+Description: Get all patrol task
+
+<br>
+
+### 5. GET - /editor/task/goto
+
+Description: Get all goto task
+
+<br>
+
+### 6. DELETE - /editor/task/<taskID>
+
+Description: Delete one collection
