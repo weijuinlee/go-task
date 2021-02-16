@@ -137,7 +137,7 @@ Description: Update one patrol
 {
    "locationID": 1,
    "mapVerID": "b2a546f9-b7a1-4623-8c93-8a574b8db1f6",
-   "name": “Patrol1”,
+   "name": "Patrol",
    "points": ["0", "1", "2", "3", "4", "5", "6"]
 }
 ```
