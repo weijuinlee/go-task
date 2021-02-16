@@ -54,10 +54,10 @@ Description: Update one graph
 <br>
 
 ### Attributes:
-### "type": 0 = null
-### "type": 1 = door
-### "type": 2 = elevator
-### "type": 3 = waiting point
+"type": 0 = null
+"type": 1 = door
+"type": 2 = elevator
+"type": 3 = waiting point
 **Parent node "0" has a capacity of 2. Child nodes are "0.0" and "0.1"**
 
 
@@ -220,11 +220,11 @@ Description: Create a task
 <br>
 
 ### Attributes:
-### "type": 0 = GOTO/Patrol
-### "type": 1 = patrolArea
-### "priority": 0 = LOW
-### "priority": 1 = MED
-### "priority": 2 = HIGH
+"type": 0 = GOTO/Patrol
+"type": 1 = patrolArea
+"priority": 0 = LOW
+"priority": 1 = MED
+"priority": 2 = HIGH
 
 <br>
 
@@ -256,10 +256,11 @@ Description: Get all goto task
 
 Description: Delete one collection
 
+<br>
+
 ### Task Scenarios
 
 <br>
-
 
 Scenario 1: 
 
