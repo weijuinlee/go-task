@@ -258,6 +258,9 @@ Description: Delete one collection
 
 ### Task Scenarios
 
+<br>
+
+
 Scenario 1: 
 
 ```json
@@ -270,6 +273,8 @@ Scenario 1:
 }
 ```
 **Number of unique robots corresponds to robot quantity**
+
+<br>
 
 Scenario 2: 
 
@@ -284,6 +289,8 @@ Scenario 2:
 }
 ```
 **Number of unique robots does not match the robot quantity.Traffic Controller has to get other available robots to perform job**
+
+<br>
 
 Scenario 3: 
 
